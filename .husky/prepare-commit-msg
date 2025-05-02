@@ -1,2 +1,0 @@
-# urge developers to use commitizen for their commit messages
-echo "⚠️ Warning: Please use 'npm run commit' to commit messages"

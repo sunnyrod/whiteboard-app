@@ -1,0 +1,3 @@
+#!/bin/sh
+# urge developers to use `npm run commit` to enforce conventional commit format
+npx --no -- commitlint --edit "$1" || (echo "⚠️ Commit message does not follow the Conventional Commits format. Please use \`npm run commit\` before pushing.")
