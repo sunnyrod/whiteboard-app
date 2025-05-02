@@ -1,56 +1,59 @@
-import './style.css'
-import Konva from 'konva'
+import './style.css';
+import Konva from 'konva';
 
-const width = 800;
-const height = 500;
+// Constants
+const DEFAULT_WIDTH = 800;
+const DEFAULT_HEIGHT = 500;
 
-const stage = new Konva.Stage({
-  container: 'board',
-  width: document.getElementById('board')?.clientWidth || width,
-  height: document.getElementById('board')?.clientHeight || height,
-});
-
+// Initialize Stage and Layer
+const stage = createStage('board', DEFAULT_WIDTH, DEFAULT_HEIGHT);
 const layer = new Konva.Layer();
 stage.add(layer);
 
+// Utility Functions
+function createStage(containerId: string, width: number, height: number): Konva.Stage {
+  return new Konva.Stage({
+    container: containerId,
+    width: document.getElementById(containerId)?.clientWidth || width,
+    height: document.getElementById(containerId)?.clientHeight || height,
+  });
+}
 
-const clearWhiteboard = () => {
+function clearWhiteboard(): void {
   layer.destroyChildren();
   layer.draw();
-};
-document.getElementById('clear')?.addEventListener('click', clearWhiteboard);
+}
 
-// Start drawing
-let isDrawing = false;
-let currentLine: Konva.Line | null = null;
-const deleteLine = (e: Konva.KonvaEventObject<MouseEvent>) => {
+function deleteLine(e: Konva.KonvaEventObject<MouseEvent>): void {
   e.currentTarget.destroy();
   layer.draw();
-};
-stage.on('mousedown touchstart', (e) => {
+}
+
+// Drawing Logic
+function startDrawing(e: Konva.KonvaEventObject<MouseEvent>): void {
   if (e.evt.button !== 0) return; // Only left mouse button
-  if (e.target !== stage) return; // Only draw on the stage
+  if (e.target !== stage) return; // Ignore clicks outside of whiteboard
+  if (isDrawing) return; // Prevent multiple lines being drawn at once 
 
   isDrawing = true;
-
   const pos = stage.getPointerPosition();
   if (!pos) return;
+
   currentLine = new Konva.Line({
     points: [pos.x, pos.y],
     stroke: 'black',
     strokeWidth: 2,
     lineCap: 'round',
-    lineJoin: 'round',
+    lineJoin: 'round'
   });
   currentLine.on('click', deleteLine);
   layer.add(currentLine);
-});
+}
 
-// Continue drawing
-stage.on('mousemove touchmove', (e) => {
+function continueDrawing(e: Konva.KonvaEventObject<MouseEvent>): void {
   if (!isDrawing) return; // Only draw when mouse is down
   if (e.evt.button !== 0) return; // Only left mouse button
-  if (e.target !== stage) return; // Only draw on the stage
+  if (e.target !== stage) return; // Only draw on the whiteboard
 
   const pos = stage.getPointerPosition();
   if (!pos || !currentLine) return;
@@ -58,10 +61,24 @@ stage.on('mousemove touchmove', (e) => {
   const newPoints = currentLine.points().concat([pos.x, pos.y]);
   currentLine.points(newPoints);
   layer.batchDraw();
-});
+}
 
-// Stop drawing
-stage.on('mouseup touchend mouseleave touchleave', () => {
+function stopDrawing(): void {
   isDrawing = false;
   currentLine = null;
-});
+}
+
+// Event Listeners
+function setupEventListeners(): void {
+  document.getElementById('clear')?.addEventListener('click', clearWhiteboard);
+
+  stage.on('mousedown', startDrawing);
+  stage.on('mousemove', continueDrawing);
+  stage.on('mouseup mouseleave', stopDrawing);
+}
+
+// Main
+let isDrawing = false;
+let currentLine: Konva.Line | null = null;
+
+setupEventListeners();
