@@ -1,24 +1,31 @@
 import './style.css'
-import typescriptLogo from './typescript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.ts'
+import Konva from 'konva'
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://www.typescriptlang.org/" target="_blank">
-      <img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
-    </a>
-    <h1>Vite + TypeScript</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite and TypeScript logos to learn more
-    </p>
-  </div>
-`
+const width = 800;
+const height = 500;
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+const stage = new Konva.Stage({
+  container: 'board',
+  width: document.getElementById('board')?.clientWidth || width,
+  height: document.getElementById('board')?.clientHeight || height,
+});
+
+const layer = new Konva.Layer();
+stage.add(layer);
+
+const circle = new Konva.Circle({
+  x: stage.width() / 2,
+  y: stage.height() / 2,
+  radius: 50,
+  fill: 'red',
+  stroke: 'black',
+  strokeWidth: 4,
+});
+
+layer.add(circle);
+layer.draw();
+
+document.getElementById('clear')?.addEventListener('click', () => {
+  layer.destroyChildren();
+  layer.draw();
+});
