@@ -40,11 +40,12 @@ function startDrawing(e: Konva.KonvaEventObject<MouseEvent>): void {
   if (!pos) return;
 
   currentLine = new Konva.Line({
-    points: [pos.x, pos.y],
+    points: [pos.x, pos.y, pos.x, pos.y], // repeat so that clicks draw points
     stroke: 'black',
     strokeWidth: 2,
     lineCap: 'round',
-    lineJoin: 'round'
+    lineJoin: 'round',
+    hitStrokeWidth: 10, // make the lines easier to click
   });
   currentLine.on('click', deleteLine);
   layer.add(currentLine);
